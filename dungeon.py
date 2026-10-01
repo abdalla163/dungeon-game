@@ -5,53 +5,82 @@ def begin():
     print("1. De dungeon binnengaan")
     print("2. Weglopen")
 
+
 def weglopen():
     print("weglopen")
     print("Je besluit weg te lopen.")
     print("Je laat de zoektocht naar de cure achter je.")
 
 
+# Roep de vechten() functie aan met de naam, health en damage van de vijand.
+# Bijvoorbeeld: vechten("Goblin", 80, 25)
+def vechten(vijand_naam, vijand_health, vijand_damage):
+    speler_health = 100
+
+    while speler_health > 0 and vijand_health > 0:
+        speler_attack = 20
+        vijand_health = vijand_health - speler_attack
+        print("Je valt de", vijand_naam, "aan!")
+        print("De", vijand_naam, "verliest", speler_attack, "HP")
+        print("Enemy health:", vijand_health)
+        if vijand_health <= 0:
+            print("Je hebt de", vijand_naam, "verslagen!")
+        else:
+            speler_health = speler_health - vijand_damage
+            print("De", vijand_naam, "valt jou aan!")
+            print("Je verliest", vijand_damage, "HP")
+            print("Jouw health:", speler_health)
+    if speler_health <= 0:
+        print("Je bent dood GAME OVER")
+
+
+def deuren():
+    print("Je hebt de goblin verslagen!")
+    print("Je loopt verder de dungeon in.")
+    print("Je komt in een grote kamer.")
+    print("Voor je staan twee deuren.")
+    print("1. De linker deur")
+    print("2. De rechter deur")
+
+    keuze = input("Welke deur kies je? ")
+
+    if keuze == "1":
+        print("Je komt in een oude opslagkamer")
+        print("Je vindt een zwaard!")
+
+    else:
+        print("Je komt in een donkere kamer")
+        print("Er is een skeleton voor je!")
+        print("Skeleton valt je aan!")
+        print("1. Aanvallen!")
+        print("2. Wegrennen!")
+
+        keuze = input("Wat wil je doen? ")
+
+        if keuze == "1":
+            vechten("skeleton", 65, 25)
+        else:
+            print("je rent weg van de skeleton")
+
 def main():
     print("naam van onze game: quest for the cure")
     begin()
 
-    keuze = input("wat wil je doen?")
+    keuze = input("wat wil je doen? ")
 
     if keuze == "1":
-        print("De dungeon binnengaan")
-        print("Het is donker en stil.")
-        print("Plotseling verschijnt er een goblin!")
-        print("1. Aanvallen!")
-        print("2. Wegrennen")
+        vechten("goblin", 50, 10)
         keuze = input("Wat wil je doen? ")
-        if keuze == "1":
-            print ("je hebt de goblin verslagen!")
-            print("Je loopt verder de dungeon in.")
-            print("Je komt in een grote kamer.")
-            print("Voor je staan twee deuren.")
-            print("1. De linker deur")
-            print("2. De rechter deur")
-            keuze = input("Welke deur kies je? ")
-            if keuze == "1":
-                print("Je komt in een oude opslagkamer")
-                print("je vindt een zwaard!")
-            else:
-                print("Je komt in een donkere kamer")
-                print("er is een skeleton voor je!")
-                print("Skeleton valt je aan!")
-                print("1. Aanvallen!")
-                print("2. Wegrennen!")
-                keuze = input("wat wil je doen?")
-                if keuze == "1":
-                    print("je hebt de skeleton verslagen!")
 
-                
+        if keuze == "1":
+            deuren()
 
         else:
             print("wegrennen!")
             print("Je rent weg van de goblin.")
             print("Je rent terug naar de ingang van de dungeon.")
             print("Je hebt de dungeon niet kunnen bereiken.")
+
     else:
         weglopen()
 
