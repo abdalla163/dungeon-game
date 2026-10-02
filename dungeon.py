@@ -47,42 +47,47 @@ def deuren():
     if keuze == "1":
         print("Je komt in een oude opslagkamer")
         print("Je vindt een zwaard!")
+        return 1
+    elif keuze == "2":
+        print("Je komt in een donkere kamer.")
+        return 2
 
     else:
-        print("Je komt in een donkere kamer")
-        print("Er is een skeleton voor je!")
-        print("Skeleton valt je aan!")
-        print("1. Aanvallen!")
-        print("2. Wegrennen!")
+        print("Ongeldige keuze!")
+        return 0
 
-        keuze = input("Wat wil je doen? ")
-
-        if keuze == "1":
-            vechten("skeleton", 65, 25)
-        else:
-            print("je rent weg van de skeleton")
 
 def main():
     print("naam van onze game: quest for the cure")
     begin()
 
     keuze = input("wat wil je doen? ")
-
     if keuze == "1":
-        vechten("goblin", 50, 10)
-        keuze = input("Wat wil je doen? ")
+        vechten("goblin", 50, 15)
 
-        if keuze == "1":
-            deuren()
+        keuze_deur = deuren()
+        if keuze_deur == 1:
+            print("Je neemt het zwaard mee")
+            print("Je loopt naar de volgende kamer")
+            print("Je ziet een grotere goblin hij noemt zichzelf de goblin koning")
 
-        else:
-            print("wegrennen!")
-            print("Je rent weg van de goblin.")
-            print("Je rent terug naar de ingang van de dungeon.")
-            print("Je hebt de dungeon niet kunnen bereiken.")
+            print("1. Val de goblin koning aan.")
+            print("2. Ren weg")
+            keuze = input("wat wil je doen? ")
+            if keuze == "1":
+                vechten("goblin koning", 80, 30)
+            elif keuze == "2":
+                print("Je rent naar een andere kamer")
+            else:
+                print("Ongeldige keuze")
 
-    else:
+        elif keuze_deur == 2:
+            print("Je hoort iets.....")
+            vechten("skeleton", 65, 20)
+    elif keuze == "2":
         weglopen()
+    else:
+        print("Ongeldige keuze")
 
 
 if __name__ == "__main__":
