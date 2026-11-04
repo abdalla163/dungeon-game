@@ -1,18 +1,29 @@
-import time
+import time, random
 
 def begin():
     print("Mijn vrouw is ziek alleen in de dungeon kan ik de cure vinden.")
     print("1. De dungeon binnengaan")
-    print("2. Weglopen")
+    print("2. vluchten")
 
 
-def weglopen():
-    print("Je besluit weg te lopen.")
-    print("Je laat de zoektocht naar de cure achter je.")
+def vluchten(vijand_naam, speler_health):
+    kans = random.randint(1, 100)
+    if kans <= 30:
+        print("Het is gelukt! je bent ontsnapt \n")
+        print("Je komt terecht in een andere kamer \n")
+
+        deuren()
+        
+        return speler_health, "gevlucht"
+    else:
+        print("Het ontsnappen is mislukt! \n")
+        print(f"{vijand_naam} valt je weer aan.")
+
+        return speler_health, "mislukt"
 
 # Roept de healthbar() functie op om te laten zien hoeveel hp de speler heeft. 
 # En gebaseerd daarop een kleur geeft (groen, geel, rood) met de tekst (gezond, gewond, kritiek!). 
-def spelerhealthbar(health):
+def speler_healthbar(health):
     totaal = 100
     blokjes = int(health / totaal * 20)
 
@@ -35,7 +46,7 @@ def spelerhealthbar(health):
     if health <= 29:
         print("WAARSCHUWING! Je hebt bijna geen levens meer!")
 
-def vijandhealthbar(health):
+def vijand_healthbar(health):
     totaal = 120
     blokjes = int(health / totaal * 50)
 
@@ -57,26 +68,29 @@ def vijandhealthbar(health):
 # Bijvoorbeeld: vechten("Goblin", 80, 25)
 
 def vechten(vijand_naam, vijand_health, vijand_attack,
-            speler_health=100, speler_attack=20):
+    speler_health=100, speler_attack=20):
 
     print(f"Een {vijand_naam} valt je aan!\n")
-    spelerhealthbar(speler_health)
+    speler_healthbar(speler_health)
 
     while speler_health > 0 and vijand_health > 0:
-        menu = input("1. Aanvallen 2. Wegrennen\n ")
+        menu = input("1. Aanvallen 2. Items 3. Wegrennen\n ")
 
         if menu == "1":
             vijand_health = max(0, vijand_health - speler_attack)
             time.sleep(1.5)
 
-            vijandhealthbar(vijand_health)
+            vijand_healthbar(vijand_health)
             print(f"Je valt de {vijand_naam} aan (-{speler_attack})")
             print(f"Goblin Koning verliest {speler_attack} HP\n")
-
+        
         elif menu == "2":
-            weglopen()
-            return speler_health, "gevlucht"
-
+            item()
+            
+        elif menu == "3":
+            speler_health, status = vluchten(vijand_naam, speler_health)
+            if status == "gevlucht":
+                return speler_health, "gevlucht"
         else:
             print("Ongeldige keuze")
             continue
@@ -87,7 +101,7 @@ def vechten(vijand_naam, vijand_health, vijand_attack,
             print(f"De {vijand_naam} valt je aan!")
             print(f"Je verliest {vijand_attack} HP\n")
 
-            spelerhealthbar(speler_health)
+            speler_healthbar(speler_health)
 
         else:
             break
@@ -171,7 +185,8 @@ def main():
             speler_health, resultaat = vechten("skeleton", 65, 20)
 
     elif keuze == "2":
-        weglopen()
+        print("Je besluit weg te lopen. \n")
+        print("Je laat de zoektocht naar de cure achter je.")
 
     else:
         print("Ongeldige keuze")
