@@ -1,188 +1,413 @@
-import time, random
+
+import time
+import random
+
+vijanden = (
+    ("goblin", 50, 15),
+    ("skeleton", 55, 17),
+    ("ogre", 90, 15),
+)
+bosses = (
+    ("goblin koning", 100, 30),
+    ("skeleton koning", 110, 34),
+)
+
 
 def begin():
-    print("Mijn vrouw is ziek alleen in de dungeon kan ik de cure vinden.")
+    time.sleep(2)
+    print("Mijn vrouw is ziek. Alleen in de dungeon kan ik de cure vinden. \n")
+    time.sleep(2)
     print("1. De dungeon binnengaan")
-    print("2. vluchten")
+    print("2. Weglopen \n")
 
 
+def weglopen():
+    time.sleep(2)
+    print("Je besluit weg te lopen.")
+    time.sleep(2)
+    print("Je laat de zoektocht naar de cure achter je.")
+
+
+# Vluchten uit een gevecht met 30% kans van slagen.
 def vluchten(vijand_naam, speler_health):
     kans = random.randint(1, 100)
+
     if kans <= 30:
-        print("Het is gelukt! je bent ontsnapt \n")
-        print("Je komt terecht in een andere kamer \n")
-
-        deuren()
-        
+        time.sleep(0.5)
+        print("Het is gelukt! Je bent ontsnapt!\n")
+        time.sleep(0.5)
+        print("Je komt terecht in een andere kamer.\n")
         return speler_health, "gevlucht"
-    else:
-        print("Het ontsnappen is mislukt! \n")
-        print(f"{vijand_naam} valt je weer aan.")
 
+    else:
+        time.sleep(0.5)
+        print("Het ontsnappen is mislukt!\n")
+        print(f"{vijand_naam} valt je weer aan.")
         return speler_health, "mislukt"
 
-# Roept de healthbar() functie op om te laten zien hoeveel hp de speler heeft. 
-# En gebaseerd daarop een kleur geeft (groen, geel, rood) met de tekst (gezond, gewond, kritiek!). 
-def speler_healthbar(health):
+
+# Inventory met verschillende items.
+def item(speler_health, healing_potions,
+         super_healing_potions, strength_potions,
+         strength_beurten, speler_naam):
+
+    while True:
+        print("\n========== INVENTORY ==========")
+        print(f"1. Healing Potion ({healing_potions})")
+        print(f"2. Super Healing Potion ({super_healing_potions})")
+        print(f"3. Strength Potion ({strength_potions})")
+        print("4. Terug")
+        print("===============================")
+
+        keuze = input("Welk item wil je gebruiken? ")
+
+        if keuze == "1":
+            if healing_potions > 0:
+                oude_health = speler_health
+
+                speler_health = min(100, speler_health + 30)
+                healing_potions -= 1
+
+                print("\nJe gebruikt een Healing Potion!")
+                speler_healthbar(speler_naam, speler_health)
+                print(f"Je HP is hersteld van {oude_health} naar {speler_health}!")
+
+                return speler_health, healing_potions, super_healing_potions, strength_potions, strength_beurten
+
+            else:
+                print("Je hebt geen Healing Potions meer!")
+
+        elif keuze == "2":
+            if super_healing_potions > 0:
+                oude_health = speler_health
+
+                speler_health = min(100, speler_health + 60)
+                super_healing_potions -= 1
+
+                print("\nJe gebruikt een Super Healing Potion!")
+                speler_healthbar(speler_naam, speler_health)
+                print(f"Je HP is hersteld van {oude_health} naar {speler_health}!")
+
+                return speler_health, healing_potions, super_healing_potions, strength_potions, strength_beurten
+
+            else:
+                print("Je hebt geen Super Healing Potions meer!")
+
+        elif keuze == "3":
+            if strength_potions > 0:
+                strength_potions -= 1
+
+                strength_beurten = 3
+
+                print("\nJe gebruikt een Strength Potion!")
+                print("Je aanvalsschade is nu verdubbeld!")
+                print("De werking duurt 3 aanvallen.")
+
+                return speler_health, healing_potions, super_healing_potions, strength_potions, strength_beurten
+
+            else:
+                print("Je hebt geen Strength Potions meer!")
+
+        elif keuze == "4":
+            print("Je gaat terug naar het gevecht.")
+
+            return speler_health, healing_potions, super_healing_potions, strength_potions, strength_beurten
+
+        else:
+            print("Ongeldige keuze!")
+
+
+# Healthbar van de speler.
+def speler_healthbar(speler_naam, health):
     totaal = 100
     blokjes = int(health / totaal * 20)
 
     if health >= 60:
-        kleur = "\033[92m"  # Groen
+        kleur = "\033[92m"
         status = "Gezond"
+
     elif health >= 30:
-        kleur = "\033[93m"  # Geel
+        kleur = "\033[93m"
         status = "Gewond"
+
     else:
-        kleur = "\033[91m"  # Rood
+        kleur = "\033[91m"
         status = "KRITIEK!"
 
     reset = "\033[0m"
 
     balk = kleur + "█" * blokjes + reset + "░" * (20 - blokjes)
 
-    print(f"HP: [{balk}] {health}/{totaal} - {status}")
+    print(f"{speler_naam} HP: [{balk}] {health}/{totaal} - {status}")
 
     if health <= 29:
-        print("WAARSCHUWING! Je hebt bijna geen levens meer!")
+        print("WAARSCHUWING! Je hebt bijna geen HP meer!")
 
-def vijand_healthbar(health):
-    totaal = 120
+
+# Healthbar van de vijand.
+def vijand_healthbar(vijand_naam, health, totaal):
     blokjes = int(health / totaal * 50)
 
-    if health >= 60:
-        kleur = "\033[92m"  # Groen
-    elif health >= 30:
-        kleur = "\033[93m"  # Geel
+    if health >= totaal * 0.6:
+        kleur = "\033[92m"
+
+    elif health >= totaal * 0.3:
+        kleur = "\033[93m"
+
     else:
-        kleur = "\033[91m"  # Rood
+        kleur = "\033[91m"
 
     reset = "\033[0m"
 
     balk = kleur + "█" * blokjes + reset + "░" * (50 - blokjes)
 
-    print(f"HP: [{balk}] {health}/{totaal}")
+    print(f"{vijand_naam} HP: [{balk}] {health}/{totaal} \n")
 
 
-# Roep de vechten() functie aan met de naam, health en damage van de vijand.
-# Bijvoorbeeld: vechten("Goblin", 80, 25)
-
+# Gevechtssysteem.
 def vechten(vijand_naam, vijand_health, vijand_attack,
-    speler_health=100, speler_attack=20):
+            speler_naam, speler_health=100, speler_attack=20,
+            healing_potions=2, super_healing_potions=1,
+            strength_potions=1):
 
-    print(f"Een {vijand_naam} valt je aan!\n")
-    speler_healthbar(speler_health)
+    vijand_totaal = vijand_health
+    strength_beurten = 0
+
+    print(f"\nEen {vijand_naam} valt {speler_naam} aan! \n")
+    time.sleep(0.5)
+
+    vijand_healthbar(vijand_naam, vijand_health, vijand_totaal)
+    speler_healthbar(speler_naam, speler_health)
 
     while speler_health > 0 and vijand_health > 0:
-        menu = input("1. Aanvallen 2. Items 3. Wegrennen\n ")
 
+        menu = input("\n1. Aanvallen  2. Items  3. Wegrennen\n")
+
+        # Aanvallen.
         if menu == "1":
-            vijand_health = max(0, vijand_health - speler_attack)
-            time.sleep(1.5)
 
-            vijand_healthbar(vijand_health)
-            print(f"Je valt de {vijand_naam} aan (-{speler_attack})")
-            print(f"Goblin Koning verliest {speler_attack} HP\n")
-        
+            if strength_beurten > 0:
+                damage = speler_attack * 2
+                strength_beurten -= 1
+
+                print("\nJe Strength Potion is actief! ")
+                print(f"Nog {strength_beurten} versterkte aanvallen.")
+
+            else:
+                damage = speler_attack
+
+            vijand_health = max(0, vijand_health - damage)
+
+            time.sleep(0.3)
+
+            print(f"\n{speler_naam} valt de {vijand_naam} aan!")
+            print(f"De {vijand_naam} verliest {damage} HP!")
+
+            vijand_healthbar(vijand_naam, vijand_health, vijand_totaal)
+
+        # Inventory openen.
         elif menu == "2":
-            item()
-            
-        elif menu == "3":
-            speler_health, status = vluchten(vijand_naam, speler_health)
-            if status == "gevlucht":
-                return speler_health, "gevlucht"
-        else:
-            print("Ongeldige keuze")
+
+            speler_health, healing_potions, super_healing_potions, strength_potions, strength_beurten = item(
+                speler_health,
+                healing_potions,
+                super_healing_potions,
+                strength_potions,
+                strength_beurten,
+                speler_naam
+            )
+
+            # De vijand valt NIET aan.
+            # De speler mag opnieuw een actie kiezen.
             continue
 
-        if vijand_health > 0:
-            speler_health = max(0, speler_health - vijand_attack)
+        # Vluchten.
+        elif menu == "3":
 
-            print(f"De {vijand_naam} valt je aan!")
-            print(f"Je verliest {vijand_attack} HP\n")
+            speler_health, status = vluchten(
+                vijand_naam, speler_health
+            )
 
-            speler_healthbar(speler_health)
+            if status == "gevlucht":
+                return speler_health, "gevlucht", healing_potions, super_healing_potions, strength_potions
 
         else:
-            break
+            print("Ongeldige keuze! \n")
+            continue
 
+        # De vijand valt terug aan als hij nog leeft.
+        if vijand_health > 0:
+
+            speler_health = max(0, speler_health - vijand_attack)
+
+            print(f"\nDe {vijand_naam} valt {speler_naam} aan!\n")
+            print(f"{speler_naam} verliest {vijand_attack} HP!\n")
+
+            speler_healthbar(speler_naam, speler_health)
+
+    # Speler dood.
     if speler_health <= 0:
-        print("Je bent dood GAME OVER")
-        return speler_health, "dood"
+        print(f"{speler_naam} is dood! GAME OVER")
 
-    print(f"Je hebt de {vijand_naam} verslagen!\n")
-    return speler_health, "gewonnen"
+        return speler_health, "dood", healing_potions, super_healing_potions, strength_potions
 
+    # Vijand verslagen.
+    print(f"\n{speler_naam} heeft de {vijand_naam} verslagen!")
 
+    return speler_health, "gewonnen", healing_potions, super_healing_potions, strength_potions
 
-# time.sleep()
+def random_vijand(speler_naam, speler_health, speler_attack=20):
+    vijand_naam, vijand_health, vijand_attack = random.choice(vijanden)
+    print(f"Je komt een {vijand_naam} tegen")
 
+    speler_health, resultaat, healing_potion, super_healing_potions, strength_potions = vechten(
+        vijand_naam, vijand_health, vijand_attack, speler_naam, speler_health, speler_attack
+    )
 
+    if resultaat == "gewonnen":
+        if vijand_naam == "goblin":
+            print("Er verschijnt een Goblin Koning! \n")
+            speler_health, resultaat, healing_potion, super_healing_potions, strength_potions = vechten("goblin koning", 100, 30, speler_naam, speler_health, speler_attack, healing_potion, super_healing_potions, strength_potions)
+        elif vijand_naam == "skeleton":
+            print("Er verschijnt een Skeleton Koning! \n")
+            speler_health, resultaat, healing_potion, super_healing_potions, strength_potions = vechten("skeleton koning", 110, 34, speler_naam, speler_health, speler_attack, healing_potion, super_healing_potions, strength_potions)
+            
+        else:
+            return speler_naam, speler_health, "gewonnen", healing_potion, super_healing_potions, strength_potions
+        
+        if resultaat == "gewonnen":
+            return speler_naam, speler_health, "baas_gewonnen", healing_potion, super_healing_potions, strength_potions
+
+    return speler_naam, speler_health, resultaat, healing_potion, super_healing_potions, strength_potions
+
+# Deuren in de dungeon.
 def deuren():
-    print("Je loopt verder de dungeon in en je ziet twee deuren voor je.\n")
-    print("Welke deur kies jij?")
-    print("1. De linker deur")
-    print("2. De rechter deur")
+    time.sleep(2)
+    print("\nJe loopt verder de dungeon in en je ziet twee deuren voor je.\n")
 
-    keuze = input("Welke deur kies je? ")
+    time.sleep(2)
+    print("1. De linker deur")
+    print("2. De rechter deur \n")
+
+    keuze = input("Welke deur kies je? \n")
 
     if keuze == "1":
-        print("Je komt in een oude opslagkamer")
-        print("Je vindt een zwaard!")
+        time.sleep(2)
+        print("Je komt in een oude opslagkamer. \n")
+        time.sleep(2)
+        print("Je vindt een zwaard! \n")
+        time.sleep(2)
+        print("Met het zwaard doe je nu 50 attack damage! \n")
+
         return 1
 
     elif keuze == "2":
-        print("Je komt in een donkere kamer.")
+        time.sleep(2)
+        print("Je komt in een donkere kamer. \n")
+
         return 2
 
     else:
-        print("Ongeldige keuze")
+        print("Ongeldige keuze. \n")
         return 0
-	
 
 
-
+# Hoofdprogramma.
 def main():
-    print("Quest for the cure\n")
+
+    print("========== QUEST FOR THE CURE ==========\n")
+
+    speler_naam = input("Jouw Naam: ")
+
+    speler_health = 100
+    speler_attack = 20
+
+    # Beginvoorraad items.
+    healing_potions = 2
+    super_healing_potions = 1
+    strength_potions = 1
+
+    print(f"\n Welkom, {speler_naam}!")
+
     begin()
 
     keuze = input("Wat wil je doen? ")
 
     if keuze == "1":
+
         keuze_deur = deuren()
 
+        # Linker deur: Goblin Koning.
         if keuze_deur == 1:
-            print("Je neemt het zwaard mee en loopt naar de volgende kamer.")
-            print("Je ziet een grotere goblin: de goblin koning!")
 
-            speler_health, resultaat = vechten(
-                "goblin koning", 120, 30, speler_attack=50)
+            speler_attack = 50
 
-            if resultaat == "gewonnen":
-                print("\nJe hebt de Goblin Koning verslagen!")
-                print("Er verschijnt een mysterieuze kist...")
-                time.sleep(2)
-                print("Je opent de kist...")
-                time.sleep(2)
-                print("In de kist ligt de cure!")
-                time.sleep(2)
-                print("Je hebt de cure gevonden!")
-                time.sleep(2)
-                print("Je kunt je vrouw redden! ❤️")
-                time.sleep(2)
-                print("Je verlaat de dungeon.")
-                time.sleep(2)
-                print("Je gaat terug naar je vrouw.")
-                time.sleep(2)
-                print("Je geeft haar de cure.")
-                time.sleep(2)
-                print("Ze is genezen!")
-                time.sleep(2)
-                print("Einde!")
+            time.sleep(2)
+            print("\nJe neemt het zwaard mee en loopt naar de volgende kamer.\n")
 
+            time.sleep(2)
+            print("\n Je loopt verder de dungeon in... \n")
+
+            speler_naam, speler_health, resultaat, healing_potion, super_healing_potions, strength_potions = random_vijand(speler_naam, speler_health, speler_attack=50)
+
+            if resultaat == "baas_gewonnen":
+
+                time.sleep(2)
+                print("Er verschijnt een mysterieuze kist... \n")
+
+                time.sleep(2)
+                print("Je opent de kist...\n")
+
+                time.sleep(2)
+                print("In de kist ligt de cure! \n")
+
+                time.sleep(2)
+                print(f"{speler_naam}, je hebt de cure gevonden! \n")
+
+                time.sleep(2)
+                print(f"{speler_naam}, je kunt je vrouw redden! ❤️ \n")
+
+                time.sleep(2)
+                print(f"{speler_naam} heeft de dungeon verslagen! \n")
+
+                time.sleep(2)
+                print("Je verlaat de dungeon. \n")
+
+                time.sleep(2)
+                print("Je gaat terug naar je vrouw. \n")
+
+                time.sleep(2)
+                print("Je geeft haar de cure. \n")
+
+                time.sleep(2)
+                print("Ze is genezen! \n")
+
+                time.sleep(2)
+                print("\n========== EINDE ==========")
+
+            elif resultaat == "gevlucht":
+                print("Je bent ontsnapt aan de vijand.")
+
+        # Rechter deur: Skeleton.
         elif keuze_deur == 2:
             print("Je hoort iets.....")
-            speler_health, resultaat = vechten("skeleton", 65, 20)
+            speler_naam, speler_health, resultaat, healing_potion, super_healing_potions, strength_potions = random_vijand(speler_naam, speler_health, speler_attack=20)
+
+            if resultaat == "gewonnen":
+
+                time.sleep(2)
+                print("\nJe hebt de vijand verslagen!")
+
+                time.sleep(2)
+                print("Je kunt verder de dungeon in, maar de cure is nog niet gevonden.")
+
+            elif resultaat == "gevlucht":
+
+                time.sleep(2)
+                print("Je bent ontsnapt aan de vijand.")
+
+        else:
+            print("Je blijft voor de deuren staan.")
 
     elif keuze == "2":
         print("Je besluit weg te lopen. \n")
@@ -191,8 +416,5 @@ def main():
     else:
         print("Ongeldige keuze")
 
-
 if __name__ == "__main__":
     main()
-
-               
